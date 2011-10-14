@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="br.com.tecisnapse.glimpse.commands.category"
+            name="Glimpse">
+      </category>
+      <command
+            categoryId="br.com.tecisnapse.glimpse.commands.category"
+            id="br.com.tecisnapse.glimpse.commands.run"
+            name="Run">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="br.com.tecisnapse.glimpse.handlers.RunHandler"
+            commandId="br.com.tecisnapse.glimpse.commands.run">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="br.com.tecisnapse.glimpse.menus.glimpse"
+               label="Glimpse">
+            <command
+                  commandId="br.com.tecisnapse.glimpse.commands.run"
+                  id="br.com.tecisnapse.glimpse.menus.run">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+
+</plugin>
