@@ -4,20 +4,20 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            id="br.com.tecisnapse.glimpse.commands.category"
+            id="br.com.tecsinapse.glimpse.commands.category"
             name="Glimpse">
       </category>
       <command
-            categoryId="br.com.tecisnapse.glimpse.commands.category"
-            id="br.com.tecisnapse.glimpse.commands.run"
+            categoryId="br.com.tecsinapse.glimpse.commands.category"
+            id="br.com.tecsinapse.glimpse.commands.run"
             name="Run">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="br.com.tecisnapse.glimpse.handlers.RunHandler"
-            commandId="br.com.tecisnapse.glimpse.commands.run">
+            class="br.com.tecsinapse.glimpse.handlers.RunHandler"
+            commandId="br.com.tecsinapse.glimpse.commands.run">
       </handler>
    </extension>
    <extension
@@ -25,11 +25,11 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
-               id="br.com.tecisnapse.glimpse.menus.glimpse"
+               id="br.com.tecsinapse.glimpse.menus.glimpse"
                label="Glimpse">
             <command
-                  commandId="br.com.tecisnapse.glimpse.commands.run"
-                  id="br.com.tecisnapse.glimpse.menus.run">
+                  commandId="br.com.tecsinapse.glimpse.commands.run"
+                  id="br.com.tecsinapse.glimpse.menus.run">
             </command>
          </menu>
       </menuContribution>

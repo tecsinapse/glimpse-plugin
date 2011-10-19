@@ -18,9 +18,6 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import br.com.tecsinapse.dealerprime.web.monitor.script.RemoteScriptRunner;
-import br.com.tecsinapse.dealerprime.web.monitor.script.RemoteScriptRunnerFactory;
-
 public class RunHandler extends AbstractHandler {
 
 	@Override
@@ -32,18 +29,12 @@ public class RunHandler extends AbstractHandler {
 			ITextEditor textEditor = (ITextEditor) activeEditor;
 			IDocumentProvider dp = textEditor.getDocumentProvider();
 			IDocument doc = dp.getDocument(textEditor.getEditorInput());
-
-			RemoteScriptRunner runner = RemoteScriptRunnerFactory
-					.create("http://xxxcnn7534.hospedagemdesites.ws:9004", "manutencao",
-							"t3c51n4p53");
-			String result = runner.run(doc.get());
-
 			ConsolePlugin plugin = ConsolePlugin.getDefault();
 			IConsoleManager conMan = plugin.getConsoleManager();
-			MessageConsole console = new MessageConsole("Glimpse - " + activeEditor.getTitle(), null);
+			MessageConsole console = new MessageConsole("Glimpse - "
+					+ activeEditor.getTitle(), null);
 			conMan.addConsoles(new IConsole[] { console });
 			MessageConsoleStream out = console.newMessageStream();
-			out.println(result);
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;
 			try {
 				IConsoleView view = (IConsoleView) activePage.showView(id);
@@ -52,6 +43,11 @@ public class RunHandler extends AbstractHandler {
 				throw new ExecutionException("Error showing console view", e);
 			}
 
+			ScriptJob job = new ScriptJob("Glimpse - "
+					+ activeEditor.getTitle(), doc.get(),
+					"http://xxxcnn7534.hospedagemdesites.ws:9000",
+					"manutencao", "t3c51n4p53", out);
+			job.schedule();
 		}
 		return null;
 	}
