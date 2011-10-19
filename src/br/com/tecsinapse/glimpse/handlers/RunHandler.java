@@ -1,4 +1,4 @@
-package br.com.tecisnapse.glimpse.handlers;
+package br.com.tecsinapse.glimpse.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
