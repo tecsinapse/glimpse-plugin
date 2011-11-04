@@ -34,5 +34,13 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+         <page
+            class="br.com.tecsinapse.glimpse.preferences.GlimpsePreferencePage"
+            id="br.com.tecsinapse.glimpse.preferences.GlimpsePreferencePage"
+            name="Glimpse">
+      </page>
+   </extension>
 
 </plugin>

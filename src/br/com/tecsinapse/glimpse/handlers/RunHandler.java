@@ -3,6 +3,7 @@ package br.com.tecsinapse.glimpse.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -17,6 +18,9 @@ import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import br.com.tecsinapse.glimpse.Activator;
+import br.com.tecsinapse.glimpse.preferences.GlimpsePreferenceConstants;
 
 public class RunHandler extends AbstractHandler {
 
@@ -43,11 +47,21 @@ public class RunHandler extends AbstractHandler {
 				throw new ExecutionException("Error showing console view", e);
 			}
 
-			ScriptJob job = new ScriptJob("Glimpse - "
-					+ activeEditor.getTitle(), doc.get(),
-					"http://xxxcnn7534.hospedagemdesites.ws:9000",
-					"manutencao", "t3c51n4p53", out);
-			job.schedule();
+			IPreferenceStore preferenceStore = Activator.getDefault()
+					.getPreferenceStore();
+			String url = preferenceStore
+					.getString(GlimpsePreferenceConstants.URL);
+			String username = preferenceStore
+					.getString(GlimpsePreferenceConstants.USERNAME);
+			String password = preferenceStore
+					.getString(GlimpsePreferenceConstants.PASSWORD);
+
+			if (url != null && username != null && password != null) {
+				ScriptJob job = new ScriptJob("Glimpse - "
+						+ activeEditor.getTitle(), doc.get(), url, username,
+						password, out);
+				job.schedule();
+			}
 		}
 		return null;
 	}
