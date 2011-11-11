@@ -6,9 +6,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import br.com.tecsinapse.dealerprime.web.monitor.script.RemoteScriptRunner;
-import br.com.tecsinapse.dealerprime.web.monitor.script.RemoteScriptRunnerFactory;
-import br.com.tecsinapse.glimpse.PluginConstants;
+import br.com.tecsinapse.glimpse.client.Monitor;
+import br.com.tecsinapse.glimpse.client.ScriptRunner;
+import br.com.tecsinapse.glimpse.client.ScriptRunnerFactory;
 
 public class ScriptJob extends Job {
 
@@ -30,21 +30,38 @@ public class ScriptJob extends Job {
 	}
 
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		RemoteScriptRunner runner = RemoteScriptRunnerFactory.create(url,
-				username, password);
-		try {
-			String result = runner.run(script);
-			out.println(result);
-			out.println("---------");
-			out.println("COMPLETED");
-			return Status.OK_STATUS;
-		} catch (RuntimeException e) {
-			out.println("-----");
-			out.println("ERROR");
-			return new Status(Status.ERROR, PluginConstants.ID,
-					"Error executing script", e);
-		}
+	protected IStatus run(final IProgressMonitor monitor) {
+		ScriptRunner scriptRunner = ScriptRunnerFactory.create(url, username,
+				password);
+
+		scriptRunner.run(script, new Monitor() {
+
+			@Override
+			public void worked(int workedSteps) {
+				monitor.worked(workedSteps);
+			}
+
+			@Override
+			public boolean isCanceled() {
+				return monitor.isCanceled();
+			}
+
+			@Override
+			public void println(Object o) {
+				out.println(o == null ? "null" : o.toString());
+			}
+
+			@Override
+			public void close() {
+				monitor.done();
+			}
+
+			@Override
+			public void begin(int steps) {
+				monitor.beginTask("Groovy", steps);
+			}
+		});
+		return Status.OK_STATUS;
 	}
 
 }
