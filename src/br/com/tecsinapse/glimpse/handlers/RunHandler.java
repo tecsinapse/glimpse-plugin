@@ -35,9 +35,8 @@ public class RunHandler extends AbstractHandler {
 			IDocument doc = dp.getDocument(textEditor.getEditorInput());
 			ConsolePlugin plugin = ConsolePlugin.getDefault();
 			IConsoleManager conMan = plugin.getConsoleManager();
-			MessageConsole console = new MessageConsole("Glimpse - "
-					+ activeEditor.getTitle(), null);
-			conMan.addConsoles(new IConsole[] { console });
+			MessageConsole console = findOrCreateMessageConsole(activeEditor,
+					conMan);
 			MessageConsoleStream out = console.newMessageStream();
 			String id = IConsoleConstants.ID_CONSOLE_VIEW;
 			try {
@@ -57,13 +56,33 @@ public class RunHandler extends AbstractHandler {
 					.getString(GlimpsePreferenceConstants.PASSWORD);
 
 			if (url != null && username != null && password != null) {
-				ScriptJob job = new ScriptJob("Glimpse - "
-						+ activeEditor.getTitle(), doc.get(), url, username,
-						password, out);
+				ScriptJob job = new ScriptJob(
+						generateConsoleName(activeEditor), doc.get(), url,
+						username, password, out);
 				job.schedule();
 			}
 		}
 		return null;
+	}
+
+	private MessageConsole findOrCreateMessageConsole(
+			final IEditorPart activeEditor, IConsoleManager conMan) {
+		String name = generateConsoleName(activeEditor);
+		IConsole[] consoles = conMan.getConsoles();
+		for (IConsole iConsole : consoles) {
+			if (iConsole.getName().equals(name) && (iConsole instanceof MessageConsole)) {
+				MessageConsole console = (MessageConsole) iConsole;
+				console.clearConsole();
+				return console;
+			}
+		}
+		MessageConsole console = new MessageConsole(name, null);
+		conMan.addConsoles(new IConsole[] { console });
+		return console;
+	}
+
+	private String generateConsoleName(final IEditorPart activeEditor) {
+		return "Glimpse - " + activeEditor.getTitle();
 	}
 
 }
