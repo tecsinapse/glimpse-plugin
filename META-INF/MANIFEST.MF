@@ -9,11 +9,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.workbench.texteditor,
- org.eclipse.ui.console
+ org.eclipse.ui.console,
+ org.eclipse.debug.ui
 Bundle-ClassPath: .,
  lib/commons-codec-1.3.jar,
  lib/commons-httpclient-3.1.jar,
  lib/commons-logging-1.0.4.jar,
- lib/glimpse-client-1.0.0.jar
+ lib/glimpse-client-1.0.0.jar,
+ lib/commons-io-2.0.1.jar
 Bundle-Activator: br.com.tecsinapse.glimpse.Activator
 Bundle-ActivationPolicy: lazy

@@ -1,4 +1,4 @@
-package br.com.tecsinapse.glimpse.handlers;
+package br.com.tecsinapse.glimpse.launch;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

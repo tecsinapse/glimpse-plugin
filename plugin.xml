@@ -2,45 +2,54 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.commands">
-      <category
-            id="br.com.tecsinapse.glimpse.commands.category"
-            name="Glimpse">
-      </category>
-      <command
-            categoryId="br.com.tecsinapse.glimpse.commands.category"
-            id="br.com.tecsinapse.glimpse.commands.run"
-            name="Run">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="br.com.tecsinapse.glimpse.handlers.RunHandler"
-            commandId="br.com.tecsinapse.glimpse.commands.run">
-      </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="br.com.tecsinapse.glimpse.menus.glimpse"
-               label="Glimpse">
-            <command
-                  commandId="br.com.tecsinapse.glimpse.commands.run"
-                  id="br.com.tecsinapse.glimpse.menus.run">
-            </command>
-         </menu>
-      </menuContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.preferencePages">
          <page
             class="br.com.tecsinapse.glimpse.preferences.GlimpsePreferencePage"
             id="br.com.tecsinapse.glimpse.preferences.GlimpsePreferencePage"
             name="Glimpse">
       </page>
+   </extension>
+   <extension
+   		point="org.eclipse.debug.ui.launchShortcuts">
+   		<shortcut
+   			class="br.com.tecsinapse.glimpse.launch.RunGlimpseLaunchShortcut"
+   			id="br.com.tecsinapse.glimpse.launch.runglimpse"
+   			label="Glimpse Script"
+   			modes="run">
+   			<contextualLaunch>
+            	<enablement>
+               		<with
+                     variable="selection">
+	                  <count
+	                        value="1">
+	                  </count>
+	                  <iterate>
+	                     <and>
+	                        <test
+	                              forcePluginActivation="true"
+	                              property="org.eclipse.debug.ui.matchesPattern"
+	                              value="*.groovy">
+	                        </test>
+	                     </and>
+	                  </iterate>
+	               </with>
+	            </enablement>
+	         </contextualLaunch>
+   		</shortcut>   		
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+      <command
+            name="Run Glimpse"
+            description="Run Eclipse"
+            categoryId="org.eclipse.debug.ui.category.run"
+            id="br.com.tecsinapse.glimpse.launch.runglimpse.run">
+      </command>
+      <keyBinding
+            keySequence="Ctrl+Shift+G"
+            contextId="org.eclipse.ui.globalScope"
+            commandId="br.com.tecsinapse.glimpse.launch.runglimpse.run"
+            keyConfigurationId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </keyBinding>
    </extension>
 
 </plugin>
