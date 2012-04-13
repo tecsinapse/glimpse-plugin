@@ -51,5 +51,16 @@
             keyConfigurationId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </keyBinding>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+         <category
+         	id="br.com.tecsinapse.glimpse.view.category"
+         	name="Glimpse"/>
+         <view
+         	id="br.com.tecsinapse.glimpse.views.console"
+         	name="Console"
+         	category="br.com.tecsinapse.glimpse.view.category"
+         	class="br.com.tecsinapse.glimpse.views.ConsoleView"/>
+   </extension>
 
 </plugin>
