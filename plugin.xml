@@ -58,7 +58,7 @@
          	name="Glimpse"/>
          <view
          	id="br.com.tecsinapse.glimpse.views.console"
-         	name="Console"
+         	name="Glimpse Console"
          	category="br.com.tecsinapse.glimpse.view.category"
          	class="br.com.tecsinapse.glimpse.views.ConsoleView"/>
    </extension>

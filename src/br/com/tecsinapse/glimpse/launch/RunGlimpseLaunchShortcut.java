@@ -45,6 +45,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import br.com.tecsinapse.glimpse.Activator;
 import br.com.tecsinapse.glimpse.preferences.GlimpsePreferenceConstants;
+import br.com.tecsinapse.glimpse.views.ConsoleView;
 
 public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 
@@ -80,20 +81,8 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 	}
 
 	private void launchJob(String fileName, String script) {
-		IWorkbenchPage activePage = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage();
-		ConsolePlugin plugin = ConsolePlugin.getDefault();
-		IConsoleManager conMan = plugin.getConsoleManager();
-		MessageConsole console = findOrCreateMessageConsole(fileName, conMan);
+		MessageConsole console = findOrCreateMessageConsole(fileName);
 		MessageConsoleStream out = console.newMessageStream();
-		String id = IConsoleConstants.ID_CONSOLE_VIEW;
-		try {
-			IConsoleView view = (IConsoleView) activePage.showView(id);
-			view.display(console);
-		} catch (PartInitException e) {
-			throw new IllegalStateException("Error showing console view", e);
-		}
-
 		IPreferenceStore preferenceStore = Activator.getDefault()
 				.getPreferenceStore();
 		String url = preferenceStore.getString(GlimpsePreferenceConstants.URL);
@@ -108,9 +97,28 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 			job.schedule();
 		}
 	}
+	
+	private MessageConsole findOrCreateMessageConsole(String title) {
+		try {
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("br.com.tecsinapse.glimpse.views.console");
+			return ConsoleView.console;
+		} catch (PartInitException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
-	private MessageConsole findOrCreateMessageConsole(String title,
-			IConsoleManager conMan) {
+	/*private MessageConsole findOrCreateMessageConsole(String title) {
+		IWorkbenchPage activePage = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage();
+		String id = IConsoleConstants.ID_CONSOLE_VIEW;
+		try {
+			IConsoleView view = (IConsoleView) activePage.showView(id);
+			view.display(console);
+		} catch (PartInitException e) {
+			throw new IllegalStateException("Error showing console view", e);
+		}
+		ConsolePlugin plugin = ConsolePlugin.getDefault();
+		IConsoleManager conMan = plugin.getConsoleManager();
 		String name = generateConsoleName(title);
 		IConsole[] consoles = conMan.getConsoles();
 		for (IConsole iConsole : consoles) {
@@ -124,7 +132,7 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 		MessageConsole console = new MessageConsole(name, null);
 		conMan.addConsoles(new IConsole[] { console });
 		return console;
-	}
+	}*/
 
 	private String generateConsoleName(String title) {
 		return "Glimpse - " + title;
