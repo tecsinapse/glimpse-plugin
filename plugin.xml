@@ -2,6 +2,10 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
+   		point="org.eclipse.core.runtime.preferences">
+   		<initializer class="br.com.tecsinapse.glimpse.preferences.GlimpsePreferenceInitializer"/>
+   </extension>
+   <extension
          point="org.eclipse.ui.preferencePages">
          <page
             class="br.com.tecsinapse.glimpse.preferences.GlimpsePreferencePage"

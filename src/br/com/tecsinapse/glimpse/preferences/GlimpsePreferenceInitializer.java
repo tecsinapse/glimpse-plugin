@@ -16,11 +16,19 @@
 
 package br.com.tecsinapse.glimpse.preferences;
 
-public interface GlimpsePreferenceConstants {
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-	String URL = "urlPreference";
-	String USERNAME = "usernamePreference";
-	String PASSWORD = "passwordPreference";
-	String CONSOLE_TYPE = "consoleTypePreference";
-	
+import br.com.tecsinapse.glimpse.Activator;
+
+public class GlimpsePreferenceInitializer extends AbstractPreferenceInitializer {
+
+	@Override
+	public void initializeDefaultPreferences() {
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		store.setDefault(GlimpsePreferenceConstants.URL,
+				"http://localhost:8081");
+		store.setDefault(GlimpsePreferenceConstants.CONSOLE_TYPE, "GLIMPSE");
+	}
+
 }

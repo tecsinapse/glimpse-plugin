@@ -11,16 +11,28 @@ import org.eclipse.ui.part.ViewPart;
 
 public class ConsoleView extends ViewPart {
 
-	private static Composite viewComposite;
+	public static final String ID = "br.com.tecsinapse.glimpse.views.console";
 
-	private static Label titleLabel;
+	private Composite viewComposite;
 
-	private static TextConsoleViewer textConsoleViewer;
+	private Label titleLabel;
 
-	public static MessageConsole createOrReplaceMessageConsole(String title) {
-		MessageConsole console = new MessageConsole(title, null);
-		createOrReplaceTextConsoleViewer(console);
-		return console;
+	private TextConsoleViewer textConsoleViewer;
+
+	public void display(MessageConsole console) {
+		if (textConsoleViewer != null) {
+			textConsoleViewer.getControl().dispose();
+		}
+		titleLabel.setText(console.getName());
+		textConsoleViewer = new TextConsoleViewer(viewComposite, console);
+		textConsoleViewer.setEditable(false);
+		GridData viewerData = new GridData();
+		viewerData.horizontalAlignment = SWT.FILL;
+		viewerData.verticalAlignment = SWT.FILL;
+		viewerData.grabExcessHorizontalSpace = true;
+		viewerData.grabExcessVerticalSpace = true;
+		textConsoleViewer.getControl().setLayoutData(viewerData);
+		viewComposite.layout();
 	}
 
 	@Override
@@ -46,22 +58,6 @@ public class ConsoleView extends ViewPart {
 		separatorData.horizontalAlignment = SWT.FILL;
 		separatorData.grabExcessHorizontalSpace = true;
 		separator.setLayoutData(separatorData);
-	}
-
-	private static void createOrReplaceTextConsoleViewer(MessageConsole console) {
-		if (textConsoleViewer != null) {
-			textConsoleViewer.getControl().dispose();
-		}
-		titleLabel.setText(console.getName());
-		textConsoleViewer = new TextConsoleViewer(viewComposite, console);
-		textConsoleViewer.setEditable(false);
-		GridData viewerData = new GridData();
-		viewerData.horizontalAlignment = SWT.FILL;
-		viewerData.verticalAlignment = SWT.FILL;
-		viewerData.grabExcessHorizontalSpace = true;
-		viewerData.grabExcessVerticalSpace = true;
-		textConsoleViewer.getControl().setLayoutData(viewerData);
-		viewComposite.layout();
 	}
 
 	@Override

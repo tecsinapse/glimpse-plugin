@@ -17,7 +17,7 @@
 package br.com.tecsinapse.glimpse.launch;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -30,14 +30,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.console.ConsolePlugin;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleConstants;
-import org.eclipse.ui.console.IConsoleManager;
-import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -45,7 +37,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import br.com.tecsinapse.glimpse.Activator;
 import br.com.tecsinapse.glimpse.preferences.GlimpsePreferenceConstants;
-import br.com.tecsinapse.glimpse.views.ConsoleView;
 
 public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 
@@ -81,10 +72,15 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 	}
 
 	private void launchJob(String fileName, String script) {
-		MessageConsole console = findOrCreateMessageConsole(fileName);
-		MessageConsoleStream out = console.newMessageStream();
 		IPreferenceStore preferenceStore = Activator.getDefault()
 				.getPreferenceStore();
+		String consoleTypeStr = preferenceStore
+				.getString(GlimpsePreferenceConstants.CONSOLE_TYPE);
+		ConsoleType consoleType = ConsoleType.valueOf(consoleTypeStr);
+		MessageConsole console = consoleType
+				.createMessageConsole(generateConsoleName(fileName));
+		MessageConsoleStream out = console.newMessageStream();
+
 		String url = preferenceStore.getString(GlimpsePreferenceConstants.URL);
 		String username = preferenceStore
 				.getString(GlimpsePreferenceConstants.USERNAME);
@@ -92,50 +88,18 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 				.getString(GlimpsePreferenceConstants.PASSWORD);
 
 		if (url != null && username != null && password != null) {
-			ScriptJob job = new ScriptJob(generateConsoleName(fileName),
-					script, url, username, password, out);
+			ScriptJob job = new ScriptJob(generateJobName(fileName), script,
+					url, username, password, out);
 			job.schedule();
 		}
 	}
-	
-	private MessageConsole findOrCreateMessageConsole(String title) {
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("br.com.tecsinapse.glimpse.views.console");
-			return ConsoleView.createOrReplaceMessageConsole(title);
-		} catch (PartInitException e) {
-			throw new IllegalStateException(e);
-		}
+
+	private String generateJobName(String fileName) {
+		return "Glimpse - " + fileName;
 	}
 
-	/*private MessageConsole findOrCreateMessageConsole(String title) {
-		IWorkbenchPage activePage = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage();
-		String id = IConsoleConstants.ID_CONSOLE_VIEW;
-		try {
-			IConsoleView view = (IConsoleView) activePage.showView(id);
-			view.display(console);
-		} catch (PartInitException e) {
-			throw new IllegalStateException("Error showing console view", e);
-		}
-		ConsolePlugin plugin = ConsolePlugin.getDefault();
-		IConsoleManager conMan = plugin.getConsoleManager();
-		String name = generateConsoleName(title);
-		IConsole[] consoles = conMan.getConsoles();
-		for (IConsole iConsole : consoles) {
-			if (iConsole.getName().equals(name)
-					&& (iConsole instanceof MessageConsole)) {
-				MessageConsole console = (MessageConsole) iConsole;
-				console.clearConsole();
-				return console;
-			}
-		}
-		MessageConsole console = new MessageConsole(name, null);
-		conMan.addConsoles(new IConsole[] { console });
-		return console;
-	}*/
-
-	private String generateConsoleName(String title) {
-		return "Glimpse - " + title;
+	private String generateConsoleName(String fileName) {
+		return fileName + " (" + new Date() + ")";
 	}
 
 }

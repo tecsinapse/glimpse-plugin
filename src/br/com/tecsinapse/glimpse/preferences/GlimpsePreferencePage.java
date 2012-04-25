@@ -16,6 +16,7 @@
 
 package br.com.tecsinapse.glimpse.preferences;
 
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
@@ -44,6 +45,8 @@ public class GlimpsePreferencePage extends FieldEditorPreferencePage implements
 				"User name", getFieldEditorParent()));
 		addField(new StringFieldEditor(GlimpsePreferenceConstants.PASSWORD,
 				"Password", getFieldEditorParent()));
+		addField(new ComboFieldEditor(GlimpsePreferenceConstants.CONSOLE_TYPE,
+				"Console type", new String[][] { { "Glimpse", "GLIMPSE" },
+						{ "Eclipse", "ECLIPSE" } }, getFieldEditorParent()));
 	}
-
 }
