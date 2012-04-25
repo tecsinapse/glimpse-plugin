@@ -1,22 +1,80 @@
 package br.com.tecsinapse.glimpse.views;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.TextConsoleViewer;
 import org.eclipse.ui.part.ViewPart;
 
 public class ConsoleView extends ViewPart {
 
-	public static MessageConsole console = new MessageConsole("Glimpse Console", null);
-	
+	private static Composite viewComposite;
+
+	private static Label titleLabel;
+
+	private static TextConsoleViewer textConsoleViewer;
+
+	public static MessageConsole createOrReplaceMessageConsole(String title) {
+		MessageConsole console = new MessageConsole(title, null);
+		createOrReplaceTextConsoleViewer(console);
+		return console;
+	}
+
 	@Override
 	public void createPartControl(Composite parent) {
-		TextConsoleViewer viewer = new TextConsoleViewer(parent, console);
-		viewer.setEditable(false);
+		viewComposite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, true);
+		layout.horizontalSpacing = 0;
+		layout.verticalSpacing = 0;
+		layout.marginTop = 0;
+		layout.marginLeft = 0;
+		layout.marginHeight = 0;
+		layout.marginBottom = 0;
+		viewComposite.setLayout(layout);
+		titleLabel = new Label(viewComposite, SWT.NONE);
+		titleLabel.setText("No script output to show at this time");
+		GridData labelData = new GridData();
+		labelData.horizontalAlignment = SWT.FILL;
+		labelData.grabExcessHorizontalSpace = true;
+		titleLabel.setLayoutData(labelData);
+		Label separator = new Label(viewComposite, SWT.SEPARATOR
+				| SWT.SHADOW_OUT | SWT.HORIZONTAL);
+		GridData separatorData = new GridData();
+		separatorData.horizontalAlignment = SWT.FILL;
+		separatorData.grabExcessHorizontalSpace = true;
+		separator.setLayoutData(separatorData);
+	}
+
+	private static void createOrReplaceTextConsoleViewer(MessageConsole console) {
+		if (textConsoleViewer != null) {
+			textConsoleViewer.getControl().dispose();
+		}
+		titleLabel.setText(console.getName());
+		textConsoleViewer = new TextConsoleViewer(viewComposite, console);
+		textConsoleViewer.setEditable(false);
+		GridData viewerData = new GridData();
+		viewerData.horizontalAlignment = SWT.FILL;
+		viewerData.verticalAlignment = SWT.FILL;
+		viewerData.grabExcessHorizontalSpace = true;
+		viewerData.grabExcessVerticalSpace = true;
+		textConsoleViewer.getControl().setLayoutData(viewerData);
+		viewComposite.layout();
 	}
 
 	@Override
 	public void setFocus() {
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+
+		textConsoleViewer = null;
+		viewComposite = null;
+		titleLabel = null;
 	}
 
 }

@@ -101,7 +101,7 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 	private MessageConsole findOrCreateMessageConsole(String title) {
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("br.com.tecsinapse.glimpse.views.console");
-			return ConsoleView.console;
+			return ConsoleView.createOrReplaceMessageConsole(title);
 		} catch (PartInitException e) {
 			throw new IllegalStateException(e);
 		}
