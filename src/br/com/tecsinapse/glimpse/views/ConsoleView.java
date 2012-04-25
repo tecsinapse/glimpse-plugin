@@ -64,13 +64,4 @@ public class ConsoleView extends ViewPart {
 	public void setFocus() {
 	}
 
-	@Override
-	public void dispose() {
-		super.dispose();
-
-		textConsoleViewer = null;
-		viewComposite = null;
-		titleLabel = null;
-	}
-
 }
