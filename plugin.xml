@@ -65,6 +65,11 @@
          	name="Glimpse Console"
          	category="br.com.tecsinapse.glimpse.view.category"
          	class="br.com.tecsinapse.glimpse.views.ConsoleView"/>
+         <view
+         	id="br.com.tecsinapse.glimpse.views.repl"
+         	name="Glimpse Repl"
+         	category="br.com.tecsinapse.glimpse.view.category"
+         	class="br.com.tecsinapse.glimpse.views.ReplView"/>
    </extension>
 
 </plugin>

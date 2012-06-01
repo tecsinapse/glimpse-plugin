@@ -25,7 +25,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.ui.ILaunchShortcut;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,8 +34,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import br.com.tecsinapse.glimpse.Activator;
-import br.com.tecsinapse.glimpse.preferences.GlimpsePreferenceConstants;
+import br.com.tecsinapse.glimpse.preferences.PreferenceUtils;
 
 public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 
@@ -72,20 +70,15 @@ public class RunGlimpseLaunchShortcut implements ILaunchShortcut {
 	}
 
 	private void launchJob(String fileName, String script) {
-		IPreferenceStore preferenceStore = Activator.getDefault()
-				.getPreferenceStore();
-		String consoleTypeStr = preferenceStore
-				.getString(GlimpsePreferenceConstants.CONSOLE_TYPE);
+		String consoleTypeStr = PreferenceUtils.getConsoleType();
 		ConsoleType consoleType = ConsoleType.valueOf(consoleTypeStr);
 		MessageConsole console = consoleType
 				.createMessageConsole(generateConsoleName(fileName));
 		MessageConsoleStream out = console.newMessageStream();
 
-		String url = preferenceStore.getString(GlimpsePreferenceConstants.URL);
-		String username = preferenceStore
-				.getString(GlimpsePreferenceConstants.USERNAME);
-		String password = preferenceStore
-				.getString(GlimpsePreferenceConstants.PASSWORD);
+		String url = PreferenceUtils.getUrl();
+		String username = PreferenceUtils.getUserName();
+		String password = PreferenceUtils.getPassword();
 
 		if (url != null && username != null && password != null) {
 			ScriptJob job = new ScriptJob(generateJobName(fileName), script,
