@@ -1,10 +1,12 @@
 package br.com.tecsinapse.glimpse.views;
 
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -30,12 +32,17 @@ public class ReplView extends ViewPart {
 
 		SashForm split = new SashForm(parent, SWT.VERTICAL);
 
+		Font font = JFaceResources.getTextFont();
+		
 		final StyledText console = new StyledText(split, SWT.V_SCROLL
 				| SWT.WRAP);
+		console.setFont(font);
 		console.setEditable(false);
 
 		final StyledText command = new StyledText(split, SWT.V_SCROLL
 				| SWT.WRAP);
+		command.setFont(font);
+		command.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN));
 		command.addVerifyKeyListener(new VerifyKeyListener() {
 
 			@Override
@@ -56,7 +63,6 @@ public class ReplView extends ViewPart {
 								String exp = command.getText();
 								String result = repl.eval(exp);
 								StringBuilder builder = new StringBuilder();
-								builder.append("----\n");
 								builder.append(exp);
 								builder.append("\n");
 								builder.append("=> ");
