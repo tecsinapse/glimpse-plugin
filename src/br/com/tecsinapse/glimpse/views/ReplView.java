@@ -32,6 +32,8 @@ public class ReplView extends ViewPart {
 		replManager = new DefaultReplManager(connector);
 
 		SashForm split = new SashForm(parent, SWT.VERTICAL);
+		split.setBackground(Display.getDefault().getSystemColor(
+				SWT.COLOR_GRAY));
 
 		Font font = JFaceResources.getTextFont();
 
