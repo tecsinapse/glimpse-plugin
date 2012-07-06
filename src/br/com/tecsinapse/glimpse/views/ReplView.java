@@ -3,6 +3,7 @@ package br.com.tecsinapse.glimpse.views;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
@@ -33,7 +34,7 @@ public class ReplView extends ViewPart {
 		SashForm split = new SashForm(parent, SWT.VERTICAL);
 
 		Font font = JFaceResources.getTextFont();
-		
+
 		final StyledText console = new StyledText(split, SWT.V_SCROLL
 				| SWT.WRAP);
 		console.setFont(font);
@@ -42,7 +43,6 @@ public class ReplView extends ViewPart {
 		final StyledText command = new StyledText(split, SWT.V_SCROLL
 				| SWT.WRAP);
 		command.setFont(font);
-		command.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN));
 		command.addVerifyKeyListener(new VerifyKeyListener() {
 
 			@Override
@@ -61,14 +61,22 @@ public class ReplView extends ViewPart {
 									repl = replManager.createRepl();
 								}
 								String exp = command.getText();
+								console.append(exp);
 								String result = repl.eval(exp);
 								StringBuilder builder = new StringBuilder();
-								builder.append(exp);
 								builder.append("\n");
 								builder.append("=> ");
 								builder.append(result);
 								builder.append("\n");
-								console.append(builder.toString());
+								String resultText = builder.toString();
+								StyleRange resultStyle = new StyleRange(console
+										.getCharCount(), resultText.length(),
+										Display.getDefault().getSystemColor(
+												SWT.COLOR_DARK_GREEN), null);
+								console.append(resultText);
+								console.setStyleRange(resultStyle);
+								console.setCaretOffset(console.getCharCount());
+								console.showSelection();
 								command.setText("");
 							}
 						});
