@@ -25,6 +25,25 @@ public class ReplView extends ViewPart {
 
 	private Repl repl;
 
+	private StyledText console;
+
+	private StyledText command;
+
+	public void reconnectRepl() {
+		repl.close();
+		repl = replManager.createRepl();
+		resetCommand();
+		resetConsole();
+	}
+
+	private void resetConsole() {
+		console.setText(";; Glimpse Repl\n");
+	}
+
+	private void resetCommand() {
+		command.setText("");
+	}
+	
 	@Override
 	public void createPartControl(Composite parent) {
 		HttpConnector connector = new HttpConnector(PreferenceUtils.getUrl(),
@@ -37,12 +56,13 @@ public class ReplView extends ViewPart {
 
 		Font font = JFaceResources.getTextFont();
 
-		final StyledText console = new StyledText(split, SWT.V_SCROLL
+		console = new StyledText(split, SWT.V_SCROLL
 				| SWT.WRAP);
 		console.setFont(font);
 		console.setEditable(false);
+		resetConsole();
 
-		final StyledText command = new StyledText(split, SWT.V_SCROLL
+		command = new StyledText(split, SWT.V_SCROLL
 				| SWT.WRAP);
 		command.setFont(font);
 		command.addVerifyKeyListener(new VerifyKeyListener() {
@@ -79,7 +99,7 @@ public class ReplView extends ViewPart {
 								console.setStyleRange(resultStyle);
 								console.setCaretOffset(console.getCharCount());
 								console.showSelection();
-								command.setText("");
+								resetCommand();
 							}
 						});
 					}
