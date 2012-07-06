@@ -1,6 +1,9 @@
 package br.com.tecsinapse.glimpse.views;
 
+import org.eclipse.jface.text.ITextListener;
+import org.eclipse.jface.text.TextEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -26,6 +29,17 @@ public class ConsoleView extends ViewPart {
 		titleLabel.setText(console.getName());
 		textConsoleViewer = new TextConsoleViewer(viewComposite, console);
 		textConsoleViewer.setEditable(false);
+		
+		textConsoleViewer.addTextListener(new ITextListener() {
+			
+			@Override
+			public void textChanged(TextEvent event) {
+				StyledText textWidget = textConsoleViewer.getTextWidget();
+				textWidget.setCaretOffset(textWidget.getCharCount());
+				textWidget.showSelection();
+			}
+		});
+		
 		GridData viewerData = new GridData();
 		viewerData.horizontalAlignment = SWT.FILL;
 		viewerData.verticalAlignment = SWT.FILL;
