@@ -16,6 +16,10 @@
 
 package br.com.tecsinapse.glimpse.views;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -26,7 +30,6 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import br.com.tecsinapse.glimpse.client.DefaultReplManager;
@@ -34,6 +37,7 @@ import br.com.tecsinapse.glimpse.client.Repl;
 import br.com.tecsinapse.glimpse.client.ReplManager;
 import br.com.tecsinapse.glimpse.client.http.HttpConnector;
 import br.com.tecsinapse.glimpse.preferences.PreferenceUtils;
+import br.com.tecsinapse.glimpse.util.DisplayUtil;
 
 public class ReplView extends ViewPart {
 
@@ -44,6 +48,48 @@ public class ReplView extends ViewPart {
 	private StyledText console;
 
 	private StyledText command;
+
+	ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE,
+			TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>());
+
+	private class ExpressionEvaluator implements Runnable {
+
+		private String expression;
+
+		public ExpressionEvaluator(String expression) {
+			this.expression = expression;
+		}
+
+		@Override
+		public void run() {
+			if (repl == null) {
+				repl = replManager.createRepl();
+			}
+			final String result = repl.eval(expression);
+			DisplayUtil.asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					console.append(expression);
+					StringBuilder builder = new StringBuilder();
+					builder.append("\n");
+					builder.append("=> ");
+					builder.append(result);
+					builder.append("\n");
+					String resultText = builder.toString();
+					StyleRange resultStyle = new StyleRange(console
+							.getCharCount(), resultText.length(), Display
+							.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN),
+							null);
+					console.append(resultText);
+					console.setStyleRange(resultStyle);
+					console.setCaretOffset(console.getCharCount());
+					console.showSelection();
+					resetCommand();
+				}
+			});
+		}
+	}
 
 	public void reconnectRepl() {
 		repl.close();
@@ -58,8 +104,10 @@ public class ReplView extends ViewPart {
 
 	private void resetCommand() {
 		command.setText("");
+		command.setEnabled(true);
+		command.setFocus();
 	}
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		HttpConnector connector = new HttpConnector(PreferenceUtils.getUrl(),
@@ -67,19 +115,16 @@ public class ReplView extends ViewPart {
 		replManager = new DefaultReplManager(connector);
 
 		SashForm split = new SashForm(parent, SWT.VERTICAL);
-		split.setBackground(Display.getDefault().getSystemColor(
-				SWT.COLOR_GRAY));
+		split.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 
 		Font font = JFaceResources.getTextFont();
 
-		console = new StyledText(split, SWT.V_SCROLL
-				| SWT.WRAP);
+		console = new StyledText(split, SWT.V_SCROLL | SWT.WRAP);
 		console.setFont(font);
 		console.setEditable(false);
 		resetConsole();
 
-		command = new StyledText(split, SWT.V_SCROLL
-				| SWT.WRAP);
+		command = new StyledText(split, SWT.V_SCROLL | SWT.WRAP);
 		command.setFont(font);
 		command.addVerifyKeyListener(new VerifyKeyListener() {
 
@@ -89,36 +134,17 @@ public class ReplView extends ViewPart {
 						&& (e.keyCode == SWT.LF || e.keyCode == SWT.CR)) {
 					e.doit = false;
 
-					Display display = PlatformUI.getWorkbench().getDisplay();
-					if (!display.isDisposed()) {
-						display.asyncExec(new Runnable() {
+					DisplayUtil.asyncExec(new Runnable() {
 
-							@Override
-							public void run() {
-								if (repl == null) {
-									repl = replManager.createRepl();
-								}
-								String exp = command.getText();
-								console.append(exp);
-								String result = repl.eval(exp);
-								StringBuilder builder = new StringBuilder();
-								builder.append("\n");
-								builder.append("=> ");
-								builder.append(result);
-								builder.append("\n");
-								String resultText = builder.toString();
-								StyleRange resultStyle = new StyleRange(console
-										.getCharCount(), resultText.length(),
-										Display.getDefault().getSystemColor(
-												SWT.COLOR_DARK_GREEN), null);
-								console.append(resultText);
-								console.setStyleRange(resultStyle);
-								console.setCaretOffset(console.getCharCount());
-								console.showSelection();
-								resetCommand();
-							}
-						});
-					}
+						@Override
+						public void run() {
+							String exp = command.getText();
+							command.setEnabled(false);
+							ExpressionEvaluator evaluator = new ExpressionEvaluator(
+									exp);
+							executor.execute(evaluator);
+						}
+					});
 				}
 			}
 		});
