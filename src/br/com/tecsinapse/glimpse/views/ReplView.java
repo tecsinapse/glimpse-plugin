@@ -41,6 +41,12 @@ import br.com.tecsinapse.glimpse.util.DisplayUtil;
 
 public class ReplView extends ViewPart {
 
+	private String url;
+
+	private String username;
+
+	private String password;
+
 	private ReplManager replManager;
 
 	private Repl repl;
@@ -62,9 +68,6 @@ public class ReplView extends ViewPart {
 
 		@Override
 		public void run() {
-			if (repl == null) {
-				repl = replManager.createRepl();
-			}
 			final String result = repl.eval(expression);
 			DisplayUtil.asyncExec(new Runnable() {
 
@@ -98,8 +101,39 @@ public class ReplView extends ViewPart {
 		resetConsole();
 	}
 
+	private void checkPreferencesStillValid() {
+		String newUrl = PreferenceUtils.getUrl();
+		String newUserName = PreferenceUtils.getUserName();
+		String newPassword = PreferenceUtils.getPassword();
+
+		if (!equals(newUrl, url) || !equals(newUserName, username) || !equals(newPassword, password)) {
+			url = newUrl;
+			username = newUserName;
+			password = newPassword;
+			HttpConnector connector = new HttpConnector(newUrl, newUserName,
+					newPassword);
+			replManager = new DefaultReplManager(connector);
+			if (repl != null) {
+				repl.close();
+			}
+		}
+	}
+	
+	private boolean equals(Object o1, Object o2) {
+		if (o1 == null && o2 == null) return true;
+		if (o1 == null) return false;
+		return o1.equals(o2);
+	}
+
 	private void resetConsole() {
-		console.setText(";; Glimpse Repl\n");
+		StringBuilder text = new StringBuilder();
+		text.append(";; Glimpse Repl");
+		if (url != null) {
+			text.append(" at ");
+			text.append(url);
+		}
+		text.append("\n");
+		console.setText(text.toString());
 	}
 
 	private void resetCommand() {
@@ -110,10 +144,6 @@ public class ReplView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		HttpConnector connector = new HttpConnector(PreferenceUtils.getUrl(),
-				PreferenceUtils.getUserName(), PreferenceUtils.getPassword());
-		replManager = new DefaultReplManager(connector);
-
 		SashForm split = new SashForm(parent, SWT.VERTICAL);
 		split.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 
@@ -138,6 +168,11 @@ public class ReplView extends ViewPart {
 
 						@Override
 						public void run() {
+							checkPreferencesStillValid();
+							if (repl == null) {
+								repl = replManager.createRepl();
+								resetConsole();
+							}
 							String exp = command.getText();
 							command.setEnabled(false);
 							ExpressionEvaluator evaluator = new ExpressionEvaluator(
